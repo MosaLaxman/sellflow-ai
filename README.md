@@ -10,7 +10,7 @@ Track 01 — AI Growth & Agentic Commerce
 ```
 
 > **🎥 5-Minute Demo Video**:  
-> `VIDEO_URL = [PASTE_YOUR_VIDEO_LINK_HERE]`
+> `VIDEO_URL = https://drive.google.com/file/d/1UWwcZyWjKT2GFRMuN_ZOANbKyaAvqFDz/view?usp=drivesdk`
 
 > **🔗 GitHub Repository**:  
 > `GITHUB_REPO_URL = https://github.com/MosaLaxman/sellflow-ai`

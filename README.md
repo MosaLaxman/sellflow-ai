@@ -559,7 +559,7 @@ npm run build
 
 ## License
 
-This project does not yet include an open-source license file. Reviewers and users should consult the repository owner before redistribution or commercial use.
+This project is licensed under the [MIT License](LICENSE) - see the LICENSE file for details.
 
 ---
 

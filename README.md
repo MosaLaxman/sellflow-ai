@@ -615,5 +615,5 @@ This project is licensed under the [MIT License](LICENSE) - see the LICENSE file
 ---
 
 ### Razorpay Buildathon Links
-- **Demo Video**: `VIDEO_URL = [PASTE_YOUR_VIDEO_LINK_HERE]`
+- **Demo Video**: `VIDEO_URL = https://drive.google.com/file/d/1UWwcZyWjKT2GFRMuN_ZOANbKyaAvqFDz/view?usp=drivesdk`
 - **Repository**: `GITHUB_REPO_URL = https://github.com/YOUR_USERNAME/sellflow-ai`

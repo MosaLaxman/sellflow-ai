@@ -1,0 +1,327 @@
+// ==============================================================================
+// SellFlow AI — Comprehensive Database Schema (Prisma ORM)
+// ==============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ------------------------------------------------------------------------------
+// 1. MERCHANT & PROFILE
+// ------------------------------------------------------------------------------
+model Merchant {
+  id                     String            @id @default(cuid())
+  name                   String
+  slug                   String            @unique
+  email                  String            @unique
+  passwordHash           String
+  logoUrl                String?
+  currency               String            @default("INR")
+  razorpayKeyId          String?
+  razorpayKeySecret      String?
+  razorpayWebhookSecret  String?
+  createdAt              DateTime          @default(now())
+  updatedAt              DateTime          @updatedAt
+
+  policy                 MerchantPolicy?
+  products               Product[]
+  productRelations       ProductRelation[]
+  customerSessions       CustomerSession[]
+  conversations          Conversation[]
+  carts                  Cart[]
+  orders                 Order[]
+  aiActions              AIAction[]
+  auditLogs              AuditLog[]
+  webhookEvents          WebhookEvent[]
+
+  @@index([slug])
+  @@index([email])
+}
+
+// ------------------------------------------------------------------------------
+// 2. MERCHANT AI & RISK POLICY
+// ------------------------------------------------------------------------------
+model MerchantPolicy {
+  id                           String   @id @default(cuid())
+  merchantId                   String   @unique
+  maxAutomaticUpsellPercentage Float    @default(50.0) // Maximum % of base item price for an upsell
+  maxAutonomousOrderAmount     Int      @default(1000000) // Max order total in minor units (e.g. 1,000,000 paise = ₹10,000)
+  allowUpsell                  Boolean  @default(true)
+  allowCrossSell               Boolean  @default(true)
+  requireCustomerConfirmation  Boolean  @default(true)
+  allowAIDiscount              Boolean  @default(false)
+  requireApprovalForDiscount   Boolean  @default(true)
+  maxProductsPerRecommendation Int      @default(3)
+  maxUpsellItems               Int      @default(1)
+  createdAt                    DateTime @default(now())
+  updatedAt                    DateTime @updatedAt
+
+  merchant                     Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+}
+
+// ------------------------------------------------------------------------------
+// 3. PRODUCT CATALOG
+// ------------------------------------------------------------------------------
+model Product {
+  id            String            @id @default(cuid())
+  merchantId    String
+  name          String
+  description   String
+  category      String
+  priceMinor    Int               // Integer in paise (₹1 = 100 paise)
+  currency      String            @default("INR")
+  imageUrl      String?
+  stockQuantity Int               @default(0)
+  status        String            @default("ACTIVE") // ACTIVE, ARCHIVED, OUT_OF_STOCK
+  tags          String[]          // Array of searchable tags
+  useCases      String[]          // Target customer use cases (e.g. "daily running", "marathon")
+  attributes    Json?             // Structured specs e.g. { weight: "240g", drop: "8mm" }
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  merchant      Merchant          @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  cartItems     CartItem[]
+  relations     ProductRelation[] @relation("BaseProduct")
+  relatedBy     ProductRelation[] @relation("RelatedProduct")
+
+  @@index([merchantId, category])
+  @@index([merchantId, status])
+}
+
+// ------------------------------------------------------------------------------
+// 4. PRODUCT RELATIONSHIPS (FOR BOUNDED UPSELL/CROSS-SELL)
+// ------------------------------------------------------------------------------
+model ProductRelation {
+  id               String   @id @default(cuid())
+  merchantId       String
+  productId        String
+  relatedProductId String
+  relationType     String   // COMPATIBLE_ACCESSORY, UPGRADE, CROSS_SELL
+  confidence       Float    @default(1.0)
+  createdAt        DateTime @default(now())
+
+  merchant         Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  product          Product  @relation("BaseProduct", fields: [productId], references: [id], onDelete: Cascade)
+  relatedProduct   Product  @relation("RelatedProduct", fields: [relatedProductId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, relatedProductId, relationType])
+  @@index([merchantId])
+  @@index([productId])
+  @@index([relatedProductId])
+}
+
+// ------------------------------------------------------------------------------
+// 5. CUSTOMER SESSION
+// ------------------------------------------------------------------------------
+model CustomerSession {
+  id            String         @id @default(cuid())
+  merchantId    String
+  sessionToken  String         @unique
+  customerName  String?
+  customerEmail String?
+  customerPhone String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  merchant      Merchant       @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  conversations Conversation[]
+  carts         Cart[]
+  orders        Order[]
+
+  @@index([merchantId, sessionToken])
+}
+
+// ------------------------------------------------------------------------------
+// 6. CONVERSATIONS & MESSAGES
+// ------------------------------------------------------------------------------
+model Conversation {
+  id                String          @id @default(cuid())
+  merchantId        String
+  customerSessionId String
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  merchant          Merchant        @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  customerSession   CustomerSession @relation(fields: [customerSessionId], references: [id], onDelete: Cascade)
+  messages          Message[]
+  aiActions         AIAction[]
+
+  @@index([merchantId])
+  @@index([customerSessionId])
+}
+
+model Message {
+  id                String       @id @default(cuid())
+  conversationId    String
+  role              String       // user, assistant, system
+  content           String
+  structuredPayload Json?        // Structured data (recommendations, upsells, action cards)
+  createdAt         DateTime     @default(now())
+
+  conversation      Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+}
+
+// ------------------------------------------------------------------------------
+// 7. CART & CART ITEMS
+// ------------------------------------------------------------------------------
+model Cart {
+  id                String          @id @default(cuid())
+  merchantId        String
+  customerSessionId String
+  status            String          @default("ACTIVE") // ACTIVE, CONVERTED, ABANDONED
+  currency          String          @default("INR")
+  subtotalMinor     Int             @default(0)
+  totalMinor        Int             @default(0)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  merchant          Merchant        @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  customerSession   CustomerSession @relation(fields: [customerSessionId], references: [id], onDelete: Cascade)
+  items             CartItem[]
+  orders            Order[]
+
+  @@index([merchantId, customerSessionId])
+}
+
+model CartItem {
+  id             String   @id @default(cuid())
+  cartId         String
+  productId      String
+  quantity       Int      @default(1)
+  unitPriceMinor Int
+  lineTotalMinor Int
+  isUpsell       Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  cart           Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product        Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([cartId])
+  @@index([productId])
+}
+
+// ------------------------------------------------------------------------------
+// 8. ORDERS & PAYMENTS
+// ------------------------------------------------------------------------------
+model Order {
+  id                String          @id @default(cuid())
+  merchantId        String
+  customerSessionId String
+  cartId            String
+  razorpayOrderId   String?         @unique
+  status            String          @default("PENDING") // PENDING, PAID, PAYMENT_FAILED, CANCELLED, VERIFICATION_REQUIRED
+  amountMinor       Int
+  currency          String          @default("INR")
+  receipt           String          @unique
+  isAiAssisted      Boolean         @default(true)
+  hasUpsellItem     Boolean         @default(false)
+  upsellAmountMinor Int             @default(0)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  merchant          Merchant        @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  customerSession   CustomerSession @relation(fields: [customerSessionId], references: [id], onDelete: Cascade)
+  cart              Cart            @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  payments          Payment[]
+  aiActions         AIAction[]
+
+  @@index([merchantId, status])
+  @@index([customerSessionId])
+  @@index([razorpayOrderId])
+}
+
+model Payment {
+  id                String    @id @default(cuid())
+  orderId           String
+  razorpayPaymentId String    @unique
+  status            String    // created, authorized, captured, failed
+  method            String?   // card, upi, netbanking, wallet
+  amountMinor       Int
+  captured          Boolean   @default(false)
+  rawStatus         Json?     // Full gateway response payload for audit
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  order             Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([razorpayPaymentId])
+}
+
+// ------------------------------------------------------------------------------
+// 9. AI ACTIONS & EXPLAINABILITY
+// ------------------------------------------------------------------------------
+model AIAction {
+  id              String        @id @default(cuid())
+  merchantId      String
+  conversationId  String?
+  orderId         String?
+  actionType      String        // RECOMMEND, UPSELL, CART_UPDATE, CHECKOUT_REQUEST, DISCOUNT
+  requestedBy     String        // AI, USER, SYSTEM
+  reason          String        // Human-readable explainability rationale
+  confidence      Float?
+  policyResult    String        // ALLOWED, BLOCKED, APPROVAL_REQUIRED
+  executionStatus String        // EXECUTED, REJECTED, FAILED
+  inputSnapshot   Json?         // Sanitized input parameters
+  outputSnapshot  Json?         // Execution result snapshot
+  createdAt       DateTime      @default(now())
+
+  merchant        Merchant      @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  conversation    Conversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+  order           Order?        @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([merchantId, actionType])
+  @@index([conversationId])
+  @@index([orderId])
+}
+
+// ------------------------------------------------------------------------------
+// 10. AUDIT LOG (COMPLIANCE & TRACEABILITY)
+// ------------------------------------------------------------------------------
+model AuditLog {
+  id         String   @id @default(cuid())
+  merchantId String
+  actorType  String   // MERCHANT, CUSTOMER, AI, SYSTEM
+  actorId    String?
+  eventType  String   // CUSTOMER_INTENT_RECEIVED, RECOMMENDATION_GENERATED, UPSELL_PROPOSED, UPSELL_ACCEPTED, UPSELL_REJECTED, CART_UPDATED, PURCHASE_CONFIRMED, RAZORPAY_ORDER_CREATED, CHECKOUT_OPENED, PAYMENT_VERIFIED, PAYMENT_FAILED, POLICY_BLOCKED, WEBHOOK_PROCESSED
+  entityType String   // Product, Cart, Order, Payment, Policy, Conversation
+  entityId   String
+  action     String   // High-level action summary
+  reason     String   // Concise structured explanation
+  metadata   Json?    // Contextual snapshots (prices, quantities, webhook ids)
+  createdAt  DateTime @default(now())
+
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  @@index([merchantId, eventType])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
+
+// ------------------------------------------------------------------------------
+// 11. WEBHOOK EVENTS & IDEMPOTENCY LEDGER
+// ------------------------------------------------------------------------------
+model WebhookEvent {
+  id               String    @id @default(cuid())
+  merchantId       String?
+  razorpayEventId  String    @unique
+  eventType        String
+  payload          Json
+  signatureValid   Boolean
+  processingStatus String    // PROCESSED, DUPLICATE_SKIPPED, FAILED, UNHANDLED
+  processedAt      DateTime?
+  createdAt        DateTime  @default(now())
+
+  merchant         Merchant? @relation(fields: [merchantId], references: [id], onDelete: SetNull)
+
+  @@index([razorpayEventId])
+  @@index([eventType])
+}

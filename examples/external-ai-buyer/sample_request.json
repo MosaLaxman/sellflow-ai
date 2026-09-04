@@ -1,0 +1,9 @@
+{
+  "query": "running shoes under ₹4000 for marathon training",
+  "merchantSlug": "apex-sports",
+  "agentId": "agent_marathon_coach",
+  "agentName": "MarathonCoach AI",
+  "includeUpsell": true,
+  "customerConfirmed": true,
+  "initiateRazorpayOrder": true
+}

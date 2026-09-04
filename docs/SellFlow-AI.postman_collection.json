@@ -1,0 +1,169 @@
+{
+  "info": {
+    "name": "SellFlow AI — Razorpay Buildathon API Collection",
+    "_postman_id": "9b128fae-2234-4b51-9e52-19e0cf476901",
+    "description": "Collection of machine-readable catalog and autonomous AI buyer APIs for SellFlow AI (Track 01: AI Growth & Agentic Commerce).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "apiKey",
+      "value": "sfai_demo_buyer_key_2026",
+      "type": "string"
+    },
+    {
+      "key": "merchantSlug",
+      "value": "apex-sports",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Discover Machine-Readable Catalog",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/agent/catalog?merchant={{merchantSlug}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "agent",
+            "catalog"
+          ],
+          "query": [
+            {
+              "key": "merchant",
+              "value": "{{merchantSlug}}"
+            }
+          ]
+        },
+        "description": "Retrieves merchant capabilities, policies, and complete active catalog with accessory relations."
+      },
+      "response": []
+    },
+    {
+      "name": "2. Search Shoes Under Budget (₹4,000)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/agent/catalog?merchant={{merchantSlug}}&query=running&priceMax=4000",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "agent",
+            "catalog"
+          ],
+          "query": [
+            {
+              "key": "merchant",
+              "value": "{{merchantSlug}}"
+            },
+            {
+              "key": "query",
+              "value": "running"
+            },
+            {
+              "key": "priceMax",
+              "value": "4000"
+            }
+          ]
+        },
+        "description": "Demonstrates natural language query filtering and strict budget ceiling enforcement."
+      },
+      "response": []
+    },
+    {
+      "name": "3. Autonomous AI Buyer Transaction (Confirmed & Order Created)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{apiKey}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"query\": \"I need running shoes under ₹4,000 for daily road training\",\n  \"merchantSlug\": \"{{merchantSlug}}\",\n  \"agentId\": \"agent_travel_planner\",\n  \"agentName\": \"TravelPlanner AI\",\n  \"includeUpsell\": true,\n  \"customerConfirmed\": true,\n  \"initiateRazorpayOrder\": true\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/agent/buyer",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "agent",
+            "buyer"
+          ]
+        },
+        "description": "Executes full agentic purchase loop: catalog search, upsell check, policy evaluation, customer authorization, and Razorpay order creation."
+      },
+      "response": []
+    },
+    {
+      "name": "4. Autonomous AI Buyer Gating Test (Unconfirmed - Policy Enforced)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{apiKey}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"query\": \"I need running shoes under ₹4,000 for daily road training\",\n  \"merchantSlug\": \"{{merchantSlug}}\",\n  \"agentId\": \"agent_travel_planner\",\n  \"agentName\": \"TravelPlanner AI\",\n  \"includeUpsell\": true,\n  \"customerConfirmed\": false,\n  \"initiateRazorpayOrder\": true\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/agent/buyer",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "agent",
+            "buyer"
+          ]
+        },
+        "description": "Tests the mandatory customer confirmation gate. Because customerConfirmed is false, order creation is safely blocked by policy."
+      },
+      "response": []
+    }
+  ]
+}

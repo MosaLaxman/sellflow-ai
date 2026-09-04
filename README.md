@@ -13,7 +13,14 @@ Track 01 — AI Growth & Agentic Commerce
 > `VIDEO_URL = [PASTE_YOUR_VIDEO_LINK_HERE]`
 
 > **🔗 GitHub Repository**:  
-> `GITHUB_REPO_URL = https://github.com/YOUR_USERNAME/sellflow-ai`
+> `GITHUB_REPO_URL = https://github.com/MosaLaxman/sellflow-ai`
+
+---
+
+<div align="center">
+  <img src="docs/screenshots/06-ai-buyer.png" alt="SellFlow AI — Autonomous AI Buyer Studio" width="100%" />
+  <p><em>Autonomous AI Buyer Studio: External agents discovering catalog, evaluating merchant policies, and executing gated Razorpay checkouts.</em></p>
+</div>
 
 ---
 
@@ -24,24 +31,25 @@ Track 01 — AI Growth & Agentic Commerce
 4. [Why SellFlow is Different](#why-sellflow-is-different)
 5. [The Three Pillars: Explainable, Bounded, Gated](#the-three-pillars-explainable-bounded-gated)
 6. [End-to-End Transaction Flow](#end-to-end-transaction-flow)
-7. [Autonomous AI Buyer Protocol](#autonomous-ai-buyer-protocol)
-8. [Machine-Readable Catalog API](#machine-readable-catalog-api)
-9. [Revenue Growth & Bounded Upsell Engine](#revenue-growth--bounded-upsell-engine)
-10. [Merchant Risk Policies](#merchant-risk-policies)
-11. [Recommended Demo Walkthrough](#recommended-demo-walkthrough)
-12. [Razorpay Payment Lifecycle](#razorpay-payment-lifecycle)
-13. [Graceful Payment Recovery](#graceful-payment-recovery)
-14. [Audit Trail & Zero Synthetic Data](#audit-trail--zero-synthetic-data)
-15. [System Architecture](#system-architecture)
-16. [Quick Start & Local Setup](#quick-start--local-setup)
-17. [Database Setup](#database-setup)
-18. [Environment Variables](#environment-variables)
-19. [Razorpay Test Mode Setup](#razorpay-test-mode-setup)
-20. [Webhook Verification & Idempotency](#webhook-verification--idempotency)
-21. [API Testing & Postman Collection](#api-testing--postman-collection)
-22. [Automated Verification & Test Suites](#automated-verification--test-suites)
-23. [Security & Governance](#security--governance)
-24. [License](#license)
+7. [Application Showcase & Screenshots](#application-showcase--screenshots)
+8. [Autonomous AI Buyer Protocol](#autonomous-ai-buyer-protocol)
+9. [Machine-Readable Catalog API](#machine-readable-catalog-api)
+10. [Revenue Growth & Bounded Upsell Engine](#revenue-growth--bounded-upsell-engine)
+11. [Merchant Risk Policies](#merchant-risk-policies)
+12. [Recommended Demo Walkthrough](#recommended-demo-walkthrough)
+13. [Razorpay Payment Lifecycle](#razorpay-payment-lifecycle)
+14. [Graceful Payment Recovery](#graceful-payment-recovery)
+15. [Audit Trail & Zero Synthetic Data](#audit-trail--zero-synthetic-data)
+16. [System Architecture](#system-architecture)
+17. [Quick Start & Local Setup](#quick-start--local-setup)
+18. [Database Setup](#database-setup)
+19. [Environment Variables](#environment-variables)
+20. [Razorpay Test Mode Setup](#razorpay-test-mode-setup)
+21. [Webhook Verification & Idempotency](#webhook-verification--idempotency)
+22. [API Testing & Postman Collection](#api-testing--postman-collection)
+23. [Automated Verification & Test Suites](#automated-verification--test-suites)
+24. [Security & Governance](#security--governance)
+25. [License](#license)
 
 ---
 
@@ -165,6 +173,49 @@ sequenceDiagram
     API->>DB: Deduplicate in WebhookEvent ledger & settle
     API->>DB: Append immutable entry to AuditLog
 ```
+
+---
+
+## Application Showcase & Screenshots
+
+### 1. Autonomous AI Buyer Studio (`/ai-buyer`)
+> External buying agents discover catalog items, evaluate compatibility, negotiate within merchant-defined policy ceilings, and trigger customer-gated Razorpay checkouts.
+
+![Autonomous AI Buyer Studio](docs/screenshots/06-ai-buyer.png)
+
+---
+
+### 2. Conversational Customer Storefront & AI Chat (`/store/apex-sports`)
+> Shoppers converse naturally with an explainable AI sales employee grounded exclusively in verified PostgreSQL catalog inventory.
+
+| AI Shopping Chat with Explainability Badges | Visual Storefront Catalog Grid |
+|:---:|:---:|
+| ![AI Shopping Chat](docs/screenshots/07-ai-shopping-chat.png) | ![Customer Shop](docs/screenshots/08-customer-shop.png) |
+
+---
+
+### 3. Real-Time Merchant Dashboard & Decision Center (`/merchant/*`)
+> Zero synthetic data. 100% of revenue, conversion rates, and AOV are calculated live from persisted database records.
+
+| Live Merchant KPI Dashboard | AI Decision Center & Audit Trail |
+|:---:|:---:|
+| ![Merchant Dashboard](docs/screenshots/02-merchant-dashboard.png) | ![AI Transaction Audit](docs/screenshots/05-ai-transaction-audit.png) |
+
+---
+
+### 4. Merchant Operations: Orders & Product Catalog
+> Complete management of customer orders, Razorpay transaction states, and relational accessory graphs.
+
+| Order Management & Payment States | Product Catalog & Accessory Relations |
+|:---:|:---:|
+| ![Merchant Orders](docs/screenshots/03-merchant-orders.png) | ![Merchant Products](docs/screenshots/04-merchant-products.png) |
+
+---
+
+### 5. Autonomous Commerce & Revenue Positioning (`/`)
+> High-converting entry point introducing merchant capabilities, autonomous checkout, and revenue recovery.
+
+![Homepage](docs/screenshots/01-homepage-autonomous-revenue-recovery.png)
 
 ---
 

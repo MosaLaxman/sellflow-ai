@@ -26,6 +26,8 @@
 >
 > *We built **SellFlow AI** to solve both sides of this equation for Razorpay Buildathon Track 01: AI Growth and Agentic Commerce."*
 
+![SellFlow AI Homepage](screenshots/01-homepage-autonomous-revenue-recovery.png)
+
 ### Phase 2: Solution & AI-Readable Catalog (0:35 - 1:15)
 *(Action: Switch to browser at `/api/agent/catalog?merchant=apex-sports`)*
 > *"Here is the first differentiator: SellFlow AI exposes an authenticated, machine-readable catalog API for external AI buyers. Notice the structured response: verified stock, detailed attributes, accessory relations, and merchant policy limits.*
@@ -57,6 +59,8 @@
 > 5. *Total server-calculated price: **₹3,998** — perfectly within the ₹4,000 budget!*
 > 6. *Finally, the customer confirmation gate authorizes the order."*
 
+![Autonomous AI Buyer Studio](screenshots/06-ai-buyer.png)
+
 ### Phase 5: Razorpay Checkout & Webhook Settlement (3:00 - 3:45)
 *(Action: Click 'Authorize & Pay with Razorpay')*
 > *"Because customer authorization is granted, SellFlow AI calls the Razorpay Orders API server-side and launches the official Razorpay Checkout modal with the authoritative Order ID.*
@@ -76,3 +80,7 @@
 > *Under AI Decisions, the merchant has complete transparency into every prompt, tool execution, and policy evaluation.*
 >
 > *SellFlow AI proves that agentic commerce can be explainable, bounded, gated, and auditable — turning everyday merchants into AI-ready businesses powered by Razorpay. Thank you!"*
+
+| Real-Time Merchant Dashboard | AI Decision Center & Audit Trail |
+|:---:|:---:|
+| ![Merchant Dashboard](screenshots/02-merchant-dashboard.png) | ![AI Transaction Audit](screenshots/05-ai-transaction-audit.png) |
